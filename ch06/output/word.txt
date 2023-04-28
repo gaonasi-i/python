@@ -1,0 +1,1 @@
+ant bee chicken deer fox elephant horse lion monkey penguin
