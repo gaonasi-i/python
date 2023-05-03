@@ -26,5 +26,5 @@ def insert():
     conn.commit() # 커밋 완료
     conn.close()
 
-insert()
+#insert()
 select()
