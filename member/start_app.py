@@ -1,13 +1,15 @@
 # 컨트롤러 start_app.py
 # templates 폴더, static 폴더
 # 웹 서버 - flask
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, \
+    redirect, url_for, session
 import sqlite3
 
 app = Flask(__name__)
 
-app.secret_key = "asdfqqwer1234!@#$%"
-# sqllist3와 연동 - 연결 개겣 생성
+app.secret_key = "asdfqqewr1234%#@"
+
+# sqlite3와 연동 - 연결 객체 생성
 def getconn():
     conn = sqlite3.connect("c:/green_porject/sqlworks/pydb/memberdb.db")
     return conn
@@ -24,13 +26,10 @@ def memberlist():
     conn = getconn()
     cursor = conn.cursor()
     sql = "SELECT * FROM member"
-    cursor.execute(sql) # 검색 수행
+    cursor.execute(sql)  # 검색 수행
     rs = cursor.fetchall()
-    print(rs)
-    for i in rs:
-        print(i)
     conn.close()
-
+    # db에 저장된 자료(rs)를 memberlist.html에 보내줌
     return render_template('memberlist.html', rs=rs)
 
 # 회원 가입
@@ -46,20 +45,19 @@ def register():
         #db에 저장
         conn = getconn()
         cursor = conn.cursor()
-        sql = f"INSERT INTO member(memberid, passwd, name, gender)" \
+        sql = f"INSERT INTO member(memberid, passwd, name, gender) " \
               f"VALUES ('{id}', '{pw}', '{name}', '{gender}')"
         # 자동 로그인 - 세션 발급
         session['userid'] = request.form['memberid']
         cursor.execute(sql)  # 검색 수행
         conn.commit()  # 커밋 완료
         conn.close()
-
-        # 회원 가입후 회원목록 페이지로 강제 이동
+        # redirect - 회원가입후 회원 목록 페이지로 강제로 이동 시킴
         return redirect(url_for('memberlist'))
     else:
         return render_template('register.html')
 
-# 로그인 페이지
+#로그인 페이지
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     if request.method == "POST":
@@ -67,8 +65,7 @@ def login():
         id = request.form['memberid']
         pw = request.form['passwd']
 
-
-        # database에 접속 - 로그인 체크
+        #database에 접속 - 로그인 체크
         conn = getconn()
         cursor = conn.cursor()
         # 동적 바인딩
@@ -79,8 +76,8 @@ def login():
         print(rs)
         conn.close()
 
-        if rs: # rs = ture
-            session['userid'] = rs[0] # memberid를 세션에 저장(세션 발급)
+        if rs: # rs = True
+            session['userid'] = rs[0]  #memberid를 세션에 저장(세션 발급)
             return redirect(url_for('index'))
         else:
             error_msg = "아이디나 비밀번호를 확인해주세요"
@@ -92,4 +89,5 @@ def login():
 def logout():
     session.clear()  #모든 세션 삭제
     return redirect(url_for('index'))
+
 app.run()
